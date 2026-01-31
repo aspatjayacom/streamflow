@@ -39,15 +39,15 @@ class User {
       const userId = uuidv4();
       return new Promise((resolve, reject) => {
         db.run(
-          'INSERT INTO users (id, username, password, avatar_path, user_role, status, disk_limit) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [userId, userData.username, hashedPassword, userData.avatar_path || null, userData.user_role || 'admin', userData.status || 'active', userData.disk_limit || 0],
+          'INSERT INTO users (id, username, password, avatar_path, user_role, status, disk_limit, expires_at, live_limit) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          [userId, userData.username, hashedPassword, userData.avatar_path || null, userData.user_role || 'admin', userData.status || 'active', userData.disk_limit || 0, userData.expires_at || null, userData.live_limit || 0],
           function (err) {
             if (err) {
               console.error("DB error during user creation:", err);
               return reject(err);
             }
             console.log("User created successfully with ID:", userId);
-            resolve({ id: userId, username: userData.username, user_role: userData.user_role || 'admin', status: userData.status || 'active', disk_limit: userData.disk_limit || 0 });
+            resolve({ id: userId, username: userData.username, user_role: userData.user_role || 'admin', status: userData.status || 'active', disk_limit: userData.disk_limit || 0, expires_at: userData.expires_at || null, live_limit: userData.live_limit || 0 });
           }
         );
       });
@@ -128,10 +128,10 @@ class User {
       try {
         const Video = require('./Video');
         const Stream = require('./Stream');
-        
+
         const userVideos = await Video.findAll(userId);
         const userStreams = await Stream.findAll(userId);
-        
+
         for (const video of userVideos) {
           try {
             await Video.delete(video.id);
@@ -139,7 +139,7 @@ class User {
             console.error(`Error deleting video ${video.id}:`, videoDeleteError);
           }
         }
-        
+
         for (const stream of userStreams) {
           try {
             await Stream.delete(stream.id, userId);
@@ -147,17 +147,17 @@ class User {
             console.error(`Error deleting stream ${stream.id}:`, streamDeleteError);
           }
         }
-        
+
         db.run('DELETE FROM users WHERE id = ?', [userId], function (err) {
           if (err) {
             console.error('Database error in delete:', err);
             return reject(err);
           }
-          resolve({ 
-            id: userId, 
-            deleted: true, 
+          resolve({
+            id: userId,
+            deleted: true,
             videosDeleted: userVideos.length,
-            streamsDeleted: userStreams.length 
+            streamsDeleted: userStreams.length
           });
         });
       } catch (error) {
@@ -171,27 +171,27 @@ class User {
     return new Promise((resolve, reject) => {
       const fields = [];
       const values = [];
-      
+
       if (updateData.username) {
         fields.push('username = ?');
         values.push(updateData.username);
       }
-      
+
       if (updateData.user_role) {
         fields.push('user_role = ?');
         values.push(updateData.user_role);
       }
-      
+
       if (updateData.status) {
         fields.push('status = ?');
         values.push(updateData.status);
       }
-      
+
       if (updateData.avatar_path) {
         fields.push('avatar_path = ?');
         values.push(updateData.avatar_path);
       }
-      
+
       if (updateData.password) {
         fields.push('password = ?');
         values.push(updateData.password);
@@ -201,16 +201,26 @@ class User {
         fields.push('disk_limit = ?');
         values.push(updateData.disk_limit);
       }
-      
+
+      if (updateData.expires_at !== undefined) {
+        fields.push('expires_at = ?');
+        values.push(updateData.expires_at);
+      }
+
+      if (updateData.live_limit !== undefined) {
+        fields.push('live_limit = ?');
+        values.push(updateData.live_limit);
+      }
+
       if (fields.length === 0) {
         return resolve({ id: userId, message: 'No fields to update' });
       }
-      
+
       fields.push('updated_at = CURRENT_TIMESTAMP');
       values.push(userId);
-      
+
       const sql = `UPDATE users SET ${fields.join(', ')} WHERE id = ?`;
-      
+
       db.run(sql, values, function (err) {
         if (err) {
           console.error('Database error in updateProfile:', err);

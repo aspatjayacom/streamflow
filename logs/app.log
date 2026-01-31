@@ -1,0 +1,41 @@
+2026-01-31T08:21:42.312Z [LOG] Logger initialized. Output will be written to console and logs/app.log
+2026-01-31T08:21:56.527Z [LOG] Logger initialized. Output will be written to console and logs/app.log
+2026-01-31T08:22:05.945Z [LOG] Database tables initialized successfully
+2026-01-31T08:22:05.957Z [LOG] StreamFlow running at:
+2026-01-31T08:22:05.962Z [LOG]   http://172.16.0.2:7575
+2026-01-31T08:22:05.967Z [LOG]   http://192.168.18.177:7575
+2026-01-31T08:22:05.981Z [LOG] [RotationService] Initializing rotation service...
+2026-01-31T08:25:24.735Z [LOG] SIGINT received, shutting down gracefully...
+2026-01-31T08:30:56.816Z [LOG] Logger initialized. Output will be written to console and logs/app.log
+2026-01-31T08:31:02.950Z [LOG] Database tables initialized successfully
+2026-01-31T08:31:02.962Z [LOG] StreamFlow running at:
+2026-01-31T08:31:02.963Z [LOG]   http://172.16.0.2:7575
+2026-01-31T08:31:02.965Z [LOG]   http://192.168.18.177:7575
+2026-01-31T08:31:02.971Z [LOG] [RotationService] Initializing rotation service...
+2026-01-31T08:36:42.941Z [LOG] Logger initialized. Output will be written to console and logs/app.log
+2026-01-31T08:36:52.612Z [LOG] Database tables initialized successfully
+2026-01-31T08:36:52.649Z [LOG] StreamFlow running at:
+2026-01-31T08:36:52.665Z [LOG]   http://172.16.0.2:7575
+2026-01-31T08:36:52.674Z [LOG]   http://192.168.18.177:7575
+2026-01-31T08:36:52.704Z [LOG] [RotationService] Initializing rotation service...
+2026-01-31T08:37:11.430Z [LOG] SIGINT received, shutting down gracefully...
+2026-01-31T08:37:53.534Z [LOG] Logger initialized. Output will be written to console and logs/app.log
+2026-01-31T08:38:31.159Z [LOG] Logger initialized. Output will be written to console and logs/app.log
+2026-01-31T08:38:38.394Z [LOG] Database tables initialized successfully
+2026-01-31T08:38:38.405Z [LOG] StreamFlow running at:
+2026-01-31T08:38:38.406Z [LOG]   http://172.16.0.2:7575
+2026-01-31T08:38:38.407Z [LOG]   http://192.168.18.177:7575
+2026-01-31T08:38:38.414Z [LOG] [RotationService] Initializing rotation service...
+2026-01-31T08:39:52.408Z [LOG] SIGINT received, shutting down gracefully...
+2026-01-31T08:48:24.147Z [LOG] Logger initialized. Output will be written to console and logs/app.log
+2026-01-31T08:48:33.215Z [LOG] Database tables initialized successfully
+2026-01-31T08:48:33.233Z [LOG] StreamFlow running at:
+2026-01-31T08:48:33.235Z [LOG]   http://172.16.0.2:7575
+2026-01-31T08:48:33.236Z [LOG]   http://192.168.18.177:7575
+2026-01-31T08:48:33.241Z [LOG] [RotationService] Initializing rotation service...
+2026-01-31T08:50:35.817Z [LOG] Logger initialized. Output will be written to console and logs/app.log
+2026-01-31T08:50:42.204Z [LOG] Database tables initialized successfully
+2026-01-31T08:50:42.218Z [LOG] StreamFlow running at:
+2026-01-31T08:50:42.219Z [LOG]   http://172.16.0.2:7575
+2026-01-31T08:50:42.221Z [LOG]   http://192.168.18.177:7575
+2026-01-31T08:50:42.227Z [LOG] [RotationService] Initializing rotation service...

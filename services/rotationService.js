@@ -222,6 +222,15 @@ async function startRotationStream(rotation, item) {
       return { success: false, error: 'User not found' };
     }
 
+    // Check live limit for member users
+    if (user.user_role === 'member' && user.live_limit > 0) {
+      const userStreams = await Stream.findAll(rotation.user_id);
+      if (userStreams.length >= user.live_limit) {
+        console.error(`[RotationService] User ${user.username} has reached live limit (${user.live_limit})`);
+        return { success: false, error: `Live limit reached (${user.live_limit})` };
+      }
+    }
+
     const YoutubeChannel = require('../models/YoutubeChannel');
     let selectedChannel = null;
 

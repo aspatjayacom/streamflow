@@ -27,7 +27,7 @@ function createTables() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`);
-      
+
       db.run(`CREATE TABLE IF NOT EXISTS videos (
         id TEXT PRIMARY KEY,
         title TEXT NOT NULL,
@@ -45,7 +45,7 @@ function createTables() {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id)
       )`);
-      
+
       db.run(`CREATE TABLE IF NOT EXISTS streams (
         id TEXT PRIMARY KEY,
         title TEXT NOT NULL,
@@ -72,7 +72,7 @@ function createTables() {
         FOREIGN KEY (user_id) REFERENCES users(id),
         FOREIGN KEY (video_id) REFERENCES videos(id)
       )`);
-      
+
       db.run(`CREATE TABLE IF NOT EXISTS stream_history (
         id TEXT PRIMARY KEY,
         stream_id TEXT,
@@ -125,13 +125,13 @@ function createTables() {
         FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE,
         FOREIGN KEY (audio_id) REFERENCES videos(id) ON DELETE CASCADE
       )`);
-      
+
       db.run(`ALTER TABLE users ADD COLUMN user_role TEXT DEFAULT 'admin'`, (err) => {
         if (err && !err.message.includes('duplicate column name')) {
           console.error('Error adding user_role column:', err.message);
         }
       });
-      
+
       db.run(`ALTER TABLE users ADD COLUMN status TEXT DEFAULT 'active'`, (err) => {
         if (err && !err.message.includes('duplicate column name')) {
           console.error('Error adding status column:', err.message);
@@ -358,6 +358,18 @@ function createTables() {
       db.run(`ALTER TABLE users ADD COLUMN disk_limit INTEGER DEFAULT 0`, (err) => {
         if (err && !err.message.includes('duplicate column name')) {
           console.error('Error adding disk_limit column to users:', err.message);
+        }
+      });
+
+      db.run(`ALTER TABLE users ADD COLUMN expires_at TIMESTAMP`, (err) => {
+        if (err && !err.message.includes('duplicate column name')) {
+          console.error('Error adding expires_at column to users:', err.message);
+        }
+      });
+
+      db.run(`ALTER TABLE users ADD COLUMN live_limit INTEGER DEFAULT 0`, (err) => {
+        if (err && !err.message.includes('duplicate column name')) {
+          console.error('Error adding live_limit column to users:', err.message);
         }
       });
 

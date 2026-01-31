@@ -444,6 +444,19 @@ app.post('/login', loginDelayMiddleware, loginLimiter, async (req, res) => {
       });
     }
 
+    // Check if account has expired (only for member role, admin never expires)
+    if (user.user_role === 'member' && user.expires_at) {
+      const expiryDate = new Date(user.expires_at);
+      const now = new Date();
+      if (now > expiryDate) {
+        return res.render('login', {
+          title: 'Login',
+          error: 'Akun Anda telah expired. Silahkan hubungi Admin untuk memperpanjang: https://wa.me/6285183166268',
+          recaptchaSiteKey: recaptchaSettings.hasKeys && recaptchaSettings.enabled ? recaptchaSettings.siteKey : null
+        });
+      }
+    }
+
     req.session.userId = user.id;
     req.session.username = user.username;
     req.session.avatar_path = user.avatar_path;
@@ -1158,7 +1171,7 @@ app.post('/api/users/delete', isAdmin, async (req, res) => {
 
 app.post('/api/users/update', isAdmin, upload.single('avatar'), async (req, res) => {
   try {
-    const { userId, username, role, status, password, diskLimit } = req.body;
+    const { userId, username, role, status, password, diskLimit, expiryDuration, expiresAt, liveLimit } = req.body;
 
     if (!userId) {
       return res.status(400).json({
@@ -1180,12 +1193,30 @@ app.post('/api/users/update', isAdmin, upload.single('avatar'), async (req, res)
       avatarPath = `/uploads/avatars/${req.file.filename}`;
     }
 
+    // Calculate expires_at based on expiryDuration or use existing
+    let newExpiresAt = user.expires_at;
+    if (expiryDuration !== undefined) {
+      if (expiryDuration === 'unlimited' || expiryDuration === '') {
+        newExpiresAt = null;
+      } else if (expiryDuration === 'custom' && expiresAt) {
+        newExpiresAt = new Date(expiresAt).toISOString();
+      } else {
+        const durationDays = parseInt(expiryDuration);
+        if (!isNaN(durationDays) && durationDays > 0) {
+          const now = new Date();
+          newExpiresAt = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+        }
+      }
+    }
+
     const updateData = {
       username: username || user.username,
       user_role: role || user.user_role,
       status: status || user.status,
       avatar_path: avatarPath,
-      disk_limit: diskLimit !== undefined && diskLimit !== '' ? parseInt(diskLimit) : user.disk_limit
+      disk_limit: diskLimit !== undefined && diskLimit !== '' ? parseInt(diskLimit) : user.disk_limit,
+      expires_at: newExpiresAt,
+      live_limit: liveLimit !== undefined && liveLimit !== '' ? parseInt(liveLimit) : user.live_limit
     };
 
     if (password && password.trim() !== '') {
@@ -1210,7 +1241,7 @@ app.post('/api/users/update', isAdmin, upload.single('avatar'), async (req, res)
 
 app.post('/api/users/create', isAdmin, upload.single('avatar'), async (req, res) => {
   try {
-    const { username, role, status, password, diskLimit } = req.body;
+    const { username, role, status, password, diskLimit, expiryDuration, liveLimit } = req.body;
 
     if (!username || !password) {
       return res.status(400).json({
@@ -1232,13 +1263,25 @@ app.post('/api/users/create', isAdmin, upload.single('avatar'), async (req, res)
       avatarPath = `/uploads/avatars/${req.file.filename}`;
     }
 
+    // Calculate expires_at based on expiryDuration
+    let expiresAt = null;
+    if (expiryDuration && expiryDuration !== 'unlimited') {
+      const now = new Date();
+      const durationDays = parseInt(expiryDuration);
+      if (!isNaN(durationDays) && durationDays > 0) {
+        expiresAt = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+      }
+    }
+
     const userData = {
       username: username,
       password: password,
       user_role: role || 'user',
       status: status || 'active',
       avatar_path: avatarPath,
-      disk_limit: diskLimit ? parseInt(diskLimit) : 0
+      disk_limit: diskLimit ? parseInt(diskLimit) : 0,
+      expires_at: expiresAt,
+      live_limit: liveLimit ? parseInt(liveLimit) : 0
     };
 
     const result = await User.create(userData);
@@ -3166,6 +3209,18 @@ app.post('/api/streams', isAuthenticated, [
     if (!errors.isEmpty()) {
       return res.status(400).json({ success: false, error: errors.array()[0].msg });
     }
+
+    // Check live limit for member users
+    const currentUser = await User.findById(req.session.userId);
+    if (currentUser && currentUser.user_role === 'member' && currentUser.live_limit > 0) {
+      const userStreams = await Stream.findAll(req.session.userId);
+      if (userStreams.length >= currentUser.live_limit) {
+        return res.status(403).json({
+          success: false,
+          error: `Anda telah mencapai batas maksimal ${currentUser.live_limit} live stream. Silahkan hubungi Admin untuk upgrade akun.`
+        });
+      }
+    }
     let platform = 'Custom';
     let platform_icon = 'ti-broadcast';
     if (req.body.rtmpUrl.includes('youtube.com')) {
@@ -3254,6 +3309,18 @@ app.post('/api/streams', isAuthenticated, [
 app.post('/api/streams/youtube', isAuthenticated, uploadThumbnail.single('thumbnail'), async (req, res) => {
   try {
     const YoutubeChannel = require('./models/YoutubeChannel');
+
+    // Check live limit for member users
+    const currentUser = await User.findById(req.session.userId);
+    if (currentUser && currentUser.user_role === 'member' && currentUser.live_limit > 0) {
+      const userStreams = await Stream.findAll(req.session.userId);
+      if (userStreams.length >= currentUser.live_limit) {
+        return res.status(403).json({
+          success: false,
+          error: `Anda telah mencapai batas maksimal ${currentUser.live_limit} live stream. Silahkan hubungi Admin untuk upgrade akun.`
+        });
+      }
+    }
 
     const { videoId, title, description, privacy, category, tags, loopVideo, scheduleStartTime, scheduleEndTime, repeat, ytChannelId } = req.body;
 

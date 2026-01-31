@@ -46,8 +46,29 @@
 Untuk instalasi otomatis, jalankan perintah berikut:
 
 ```bash
-curl -o install.sh https://raw.githubusercontent.com/bangtutorial/streamflow/main/install.sh && chmod +x install.sh && ./install.sh
+curl -o install.sh https://raw.githubusercontent.com/aspatjayacom/streamflow/refs/heads/main/install.sh && chmod +x install.sh && ./install.sh
 ```
+
+## 🔄 Pembaruan (Update)
+
+Untuk memperbarui aplikasi ke versi terbaru tanpa menghapus data (Database, Uploads, Config):
+
+1. Masuk ke direktori aplikasi:
+   ```bash
+   cd streamflow
+   ```
+
+2. Jalankan script update:
+   ```bash
+   bash update.sh
+   ```
+
+   Script ini otomatis akan:
+   - ✅ Backup data Anda (db, env, uploads)
+   - ✅ Mengambil kode terbaru dari GitHub
+   - ✅ Mengembalikan data Anda
+   - ✅ Memperbarui dependencies
+   - ✅ Restart aplikasi
 
 ## 🔧 Manual Installation
 

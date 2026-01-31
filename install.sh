@@ -47,7 +47,7 @@ else
 fi
 
 echo "📥 Clone repository..."
-git clone https://github.com/bangtutorial/streamflow
+git clone https://github.com/aspatjayacom/streamflow
 cd streamflow
 
 echo "⚙️ Installing dependencies..."

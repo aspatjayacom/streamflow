@@ -49,6 +49,11 @@ Untuk instalasi otomatis, jalankan perintah berikut:
 curl -o install.sh https://raw.githubusercontent.com/aspatjayacom/streamflow/refs/heads/main/install.sh && chmod +x install.sh && ./install.sh
 ```
 
+```bash
+alternative:
+curl -o install.sh https://raw.githubusercontent.com/aspatjayacom/streamflow/refs/heads/main/install.sh && sed -i 's/\r$//' install.sh && chmod +x install.sh && ./install.sh
+```
+
 ## 🔄 Pembaruan (Update)
 
 Untuk memperbarui aplikasi ke versi terbaru tanpa menghapus data (Database, Uploads, Config):
@@ -337,5 +342,6 @@ pm2 restart streamflow
 
 ---
 © 2026 - [Bang Tutorial](https://youtube.com/bangtutorial)
+
 
 
